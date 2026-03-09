@@ -32,7 +32,15 @@ This project is a MERN-stack application being developed for placement preparati
   - Validated PDF upload functionality using Postman.
   - Secured the repository by adding `uploads/` to `.gitignore`.
 
+### [Day 3] - Resume PDF Parsing API
+- **[x] Step 7: Text Extraction Infrastructure**
+  - Implemented service-oriented architecture by creating `services/resumeParser.js` to isolate business logic from routing.
+  - Configured `pdf-parse@1.1.1` to reliably convert raw PDF buffer data into human-readable text strings.
+  - Addressed and documented a real-world library deprecation issue related to Node 22 buffer handling.
+  - Updated the `/api/resume/upload` route to asynchronously parse incoming files immediately after Multer saves them to the disk.
+  - Successfully returned 1,600+ characters of raw resume text back to the Postman client in real-time.
+
 ## 🔜 Next Steps
-- Implement PDF Parsing to extract data from uploaded resumes.
-- Define Mongoose Models (e.g., User, Application) to store parsed data.
-- Build RESTful API routes for user authentication and data retrieval.
+- Implement AI Integration (e.g., Gemini or OpenAI) to analyze the raw extracted text into structured JSON data (Skills, Education, Experience).
+- Define Database Models (User, Job, Application) to permanently store the structured user intelligence.
+- Implement user authentication (JWT) to securely associate uploaded resumes with specific accounts.

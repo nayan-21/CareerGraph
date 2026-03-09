@@ -20,7 +20,19 @@ This project is a MERN-stack application being developed for placement preparati
   - Configured `.gitignore` to secure sensitive files (`.env`) and exclude heavy dependencies (`node_modules/`).
   - Successfully pushed out initial commit to the `main` branch.
 
+### [Day 2] - Resume Upload API (Multer)
+- **[x] Step 5: Connect to Database (MongoDB)**
+  - Successfully connected the Express server to a MongoDB Atlas cluster using Mongoose.
+  - Implemented secure credential management via `.env` variables.
+- **[x] Step 6: File Upload Infrastructure (Multer)**
+  - Installed `multer` and `pdf-parse`.
+  - Created `Server/routes/resumeRoutes.js` to isolate resume API logic.
+  - Configured `multer.diskStorage` to reliably save uploaded resumes to `uploads/` directory with unique timestamped filenames.
+  - Successfully connected router as middleware in `server.js` (`app.use('/api/resume', resumeRoutes)`).
+  - Validated PDF upload functionality using Postman.
+  - Secured the repository by adding `uploads/` to `.gitignore`.
+
 ## 🔜 Next Steps
-- Connect to MongoDB database securely using `.env` connection strings.
-- Define initial Mongoose Models for the application.
-- Build RESTful API routes.
+- Implement PDF Parsing to extract data from uploaded resumes.
+- Define Mongoose Models (e.g., User, Application) to store parsed data.
+- Build RESTful API routes for user authentication and data retrieval.

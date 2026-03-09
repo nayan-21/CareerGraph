@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const parseResume = require('../services/resumeParser'); // Import our new parser service
 const router = express.Router();
 
 // ------------------------------------------------------------------
@@ -9,22 +10,15 @@ const router = express.Router();
 
 // Set up where and how the files should be stored
 const storage = multer.diskStorage({
-    // 1. Destination: Where to put the uploaded files
     destination: function (req, file, cb) {
-        // 'cb' is a callback function. The first argument is an error (null here),
-        // the second is the path to the folder.
         cb(null, 'uploads/'); 
     },
-    // 2. Filename: What to call the file once it's saved
     filename: function (req, file, cb) {
-        // We add Date.now() to make sure every file name is totally unique.
-        // Otherwise, if two users upload 'resume.pdf', the second one overwrites the first!
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
-// Create the upload middleware using the storage config we just made
 const upload = multer({ storage: storage });
 
 // ------------------------------------------------------------------
@@ -32,21 +26,22 @@ const upload = multer({ storage: storage });
 // ------------------------------------------------------------------
 
 // POST /api/resume/upload
-// The 'upload.single("resume")' middleware intercepts the request, saves the file
-// that was attached to the "resume" field, and THEN passes control to our function.
-router.post('/upload', upload.single('resume'), (req, res) => {
+router.post('/upload', upload.single('resume'), async (req, res) => { // Added 'async' here since PDF parsing takes time
     try {
-        // If multer failed or no file was uploaded, req.file will be undefined
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded.' });
         }
 
-        // If we reach here, it means multer successfully saved the file to /uploads!
         console.log("File saved successfully:", req.file);
 
-        // Send a success response back to the frontend
+        // --- NEW CODE FOR DAY 3 ---
+        // 1. Pass the path of the saved file to our new parser service
+        const extractedText = await parseResume(req.file.path);
+
+        // 2. Return the success message AND the extracted text to the frontend
         res.status(200).json({
-            message: 'Resume uploaded successfully!',
+            message: 'Resume processed successfully!',
+            resumeText: extractedText,
             fileDetails: {
                 filename: req.file.filename,
                 path: req.file.path,
@@ -54,10 +49,9 @@ router.post('/upload', upload.single('resume'), (req, res) => {
             }
         });
     } catch (error) {
-        console.error("Error during upload:", error);
-        res.status(500).json({ message: 'Server error during upload.' });
+        console.error("Error during upload/parsing:", error);
+        res.status(500).json({ message: 'Server error during upload or parsing.' });
     }
 });
 
-// Export the router so we can use it in server.js
 module.exports = router;

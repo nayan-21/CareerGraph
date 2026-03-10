@@ -1,0 +1,35 @@
+# Day 4: Skill Extraction Implementation Plan
+
+Goal: Take the unstructured raw text extracted from the PDF in Day 3, search it for known keywords, and return a structured array of skills. 
+
+## Why are we doing this? (Placement Explanation)
+Right now, our server only sees the resume as a giant wall of text. For algorithms to match a candidate to a job, we need structured data (arrays, objects, databases). By creating a "Skill Extractor," we are converting unstructured data (raw text) into structured intelligence (an array of specific skills).
+- **Separation of Concerns (Utils vs Services)**: Yesterday we made a `services` folder because parsing a PDF requires complex external libraries and asynchronous file reading. Today, we will make a `utils` folder for our skill extractor. In backend architecture, a "util" (utility function) is a pure, helper function. It just takes an input (text), does some simple mathematical/string logic, and returns an output (array) without touching the database or file system.
+- **Data Normalization**: We will use techniques like `.toLowerCase()` to ensure that "React", "react", and "REACT" are all recognized as the exact same skill by the machine.
+
+## Proposed Changes
+
+### 1. New Utility Folder & File
+- **Create Folder**: `Server/utils/`
+#### [NEW] [Server/utils/extractSkills.js](file:///c:/Users/Nayan/Downloads/CareerGraph/Server/utils/extractSkills.js)
+- **What it will do**:
+  1. Define an array of industry-standard known skills (e.g., `['react', 'node.js', 'javascript', 'python', 'java', 'mongodb', 'express']`).
+  2. Create a function `extractSkills(resumeText)` that converts the entire resume text to lowercase.
+  3. Loop through the known skills and check if they exist in the text.
+  4. Return an array of all the matched skills.
+
+### 2. Update the Upload Route
+#### [MODIFY] [Server/routes/resumeRoutes.js](file:///c:/Users/Nayan/Downloads/CareerGraph/Server/routes/resumeRoutes.js)
+- **What it will do**:
+  1. Import the new `extractSkills` utility.
+  2. After `extractText` finishes parsing the PDF, immediately pass `extractedText` into `extractSkills()`.
+  3. Attach the resulting `skills` array to the JSON response so the frontend can display it.
+
+## Verification Plan
+1. Ensure the server is running (`npm run dev`).
+2. Open Postman.
+3. Make the same `POST` request to `http://localhost:5000/api/resume/upload` using your resume.
+4. Verify that the response JSON now contains an array of `skills` detected from your resume!
+
+## Final Step
+Commit the progress to GitHub with the message: `Day 4: Implemented skill extraction from resume text`

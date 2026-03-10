@@ -2,13 +2,13 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const parseResume = require('../services/resumeParser'); // Import our new parser service
+const extractSkills = require('../utils/extractSkills'); // Import the skill extraction utility
 const router = express.Router();
 
 // ------------------------------------------------------------------
 // MULTER CONFIGURATION
 // ------------------------------------------------------------------
 
-// Set up where and how the files should be stored
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/'); 
@@ -25,8 +25,7 @@ const upload = multer({ storage: storage });
 // API ROUTES
 // ------------------------------------------------------------------
 
-// POST /api/resume/upload
-router.post('/upload', upload.single('resume'), async (req, res) => { // Added 'async' here since PDF parsing takes time
+router.post('/upload', upload.single('resume'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded.' });
@@ -34,13 +33,16 @@ router.post('/upload', upload.single('resume'), async (req, res) => { // Added '
 
         console.log("File saved successfully:", req.file);
 
-        // --- NEW CODE FOR DAY 3 ---
         // 1. Pass the path of the saved file to our new parser service
         const extractedText = await parseResume(req.file.path);
 
-        // 2. Return the success message AND the extracted text to the frontend
+        // 2. Extract structured skills from the raw text
+        const extractedSkills = extractSkills(extractedText);
+
+        // 3. Return the success message, text, and skills back to the API client
         res.status(200).json({
             message: 'Resume processed successfully!',
+            skills: extractedSkills,
             resumeText: extractedText,
             fileDetails: {
                 filename: req.file.filename,

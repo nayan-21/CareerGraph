@@ -40,7 +40,14 @@ This project is a MERN-stack application being developed for placement preparati
   - Updated the `/api/resume/upload` route to asynchronously parse incoming files immediately after Multer saves them to the disk.
   - Successfully returned 1,600+ characters of raw resume text back to the Postman client in real-time.
 
+### [Day 4] - Skill Extraction Utility
+- **[x] Step 8: Dictionary-Based Skill Extraction**
+  - Created a pure utility function `utils/extractSkills.js` to normalize unstructured resume text.
+  - Implemented a canonical dictionary mapping to resolve skill aliases (e.g., `React.js`, `ReactJS` → `React`).
+  - Integrated JavaScript `Set` to enforce mathematical deduplication of extracted skills.
+  - Connected the extractor into `resumeRoutes.js` to automatically parse and return structured skills upon every successful file upload.
+  - Transformed the unstructured PDF data into a polished, sortable JSON array for the frontend.
+
 ## 🔜 Next Steps
-- Implement AI Integration (e.g., Gemini or OpenAI) to analyze the raw extracted text into structured JSON data (Skills, Education, Experience).
 - Define Database Models (User, Job, Application) to permanently store the structured user intelligence.
 - Implement user authentication (JWT) to securely associate uploaded resumes with specific accounts.

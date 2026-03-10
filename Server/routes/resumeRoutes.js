@@ -1,8 +1,9 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const parseResume = require('../services/resumeParser'); // Import our new parser service
+const parseResume = require('../services/resumeParser'); // Import our parser service
 const extractSkills = require('../utils/extractSkills'); // Import the skill extraction utility
+const Resume = require('../models/Resume'); // Import our new MongoDB Model
 const router = express.Router();
 
 // ------------------------------------------------------------------
@@ -31,28 +32,40 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded.' });
         }
 
-        console.log("File saved successfully:", req.file);
+        console.log("File saved physically by Multer:", req.file.path);
 
-        // 1. Pass the path of the saved file to our new parser service
+        // 1. Pass the path of the saved file to our parser service
         const extractedText = await parseResume(req.file.path);
 
         // 2. Extract structured skills from the raw text
         const extractedSkills = extractSkills(extractedText);
 
-        // 3. Return the success message, text, and skills back to the API client
-        res.status(200).json({
-            message: 'Resume processed successfully!',
-            skills: extractedSkills,
-            resumeText: extractedText,
-            fileDetails: {
-                filename: req.file.filename,
-                path: req.file.path,
-                size: req.file.size
-            }
+        // --- NEW CODE FOR DAY 5: DB STORAGE ---
+        
+        // 3. Instantiate our Mongoose model with the parsed data
+        const newResumeDocument = new Resume({
+            fileName: req.file.originalname, // The original name of the PDF
+            filePath: req.file.path,         // Where it is stored
+            extractedText: extractedText,    // The giant string of text
+            skills: extractedSkills          // The organized array
         });
+
+        // 4. Save the Document into MongoDB Atlas asynchronously
+        await newResumeDocument.save();
+        console.log("Resume successfully saved to MongoDB Atlas:", newResumeDocument._id);
+
+        // 5. Return a lean, organized response to the frontend client
+        // We omit the giant `extractedText` so we don't clog up bandwidth
+        res.status(200).json({
+            message: 'Resume parsed and saved successfully!',
+            resumeId: newResumeDocument._id, 
+            fileName: newResumeDocument.fileName,
+            skills: newResumeDocument.skills
+        });
+
     } catch (error) {
-        console.error("Error during upload/parsing:", error);
-        res.status(500).json({ message: 'Server error during upload or parsing.' });
+        console.error("Error during upload/parsing/saving:", error);
+        res.status(500).json({ message: 'Server error during upload or database operation.' });
     }
 });
 

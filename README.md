@@ -48,6 +48,15 @@ This project is a MERN-stack application being developed for placement preparati
   - Connected the extractor into `resumeRoutes.js` to automatically parse and return structured skills upon every successful file upload.
   - Transformed the unstructured PDF data into a polished, sortable JSON array for the frontend.
 
+### [Day 5] - Database Persistence Layer
+- **[x] Step 9: Designed Mongoose Schema**
+  - Crafted `models/Resume.js` enforcing strict typing for PDF storage.
+  - Implemented real-world indexing (`index: true`) on the `skills` array to achieve O(log N) read speeds for future matchmaking algorithms.
+  - Added `required: true` validation to the `fileName`, `filePath`, and `extractedText` fields to prevent data corruption.
+- **[x] Step 10: Connected Routes to MongoDB**
+  - Updated the upload routing logic to asynchronously create Document instances (`new Resume({...})`) post-extraction.
+  - Stripped massive text blocks from the API response to save bandwidth, returning only the lean MongoDB Document ID alongside the detected array.
+
 ## 🔜 Next Steps
-- Define Database Models (User, Job, Application) to permanently store the structured user intelligence.
-- Implement user authentication (JWT) to securely associate uploaded resumes with specific accounts.
+- Implement Authentication (JWT/Bcrypt) to securely associate uploaded resumes with specific User accounts. 
+- Develop Job Posting models for recruiters to upload position requirements.

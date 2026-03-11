@@ -64,7 +64,13 @@ This project is a MERN-stack application being developed for placement preparati
   - Implemented `router.get('/:id')` with strict `mongoose.Types.ObjectId` validation to intercept malformed requests.
   - Developed `router.get('/')` to return all applicants, integrating mathematical `.skip()` and `.limit()` mechanics for pagination, and `.sort({createdAt: -1})` for reverse-chronological ordering.
   - Employed Database Projection (`.select('-extractedText')`) across all GET routes to violently strip raw PDF text strings from DB responses, optimizing server memory and network bandwidth.
-  - Established a unified, structured JSON response format (`{ success: boolean, data: ... }`) handling 400, 404, and 500 error scenarios seamlessly.
+### [Day 7] - The Candidate Intelligence Engine (ATS)
+- **[x] Step 13: Mathematical Evaluation Algorithm**
+  - Engineered `services/atsScorer.js`, enabling the server to quantitatively score uploaded resumes via rigorous keyword matrices.
+  - Deployed defensive programming to map skills arrays to JavaScript `Set()`s for absolute uniqueness, and forcefully applied `.toLowerCase()` across the raw PDF string to neutralize capitalization edge-cases during structural detection (Education, Experience, Projects).
+- **[x] Step 14: Analytical Sub-Document Schemas**
+  - Updated the Mongoose Schema to permanently trap the Integer `atsScore` and the detailed JSON `atsBreakdown`.
+  - Stated the pipeline logic directly inside the `/upload` route *after* extraction but prior to `.save()`, guaranteeing scores are dynamically generated against the fresh payload data every single time.
 
 ## 🔜 Next Steps
 - Implement Authentication (JWT/Bcrypt) to securely associate uploaded resumes with specific User accounts. 

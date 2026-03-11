@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const parseResume = require('../services/resumeParser'); 
 const extractSkills = require('../utils/extractSkills'); 
+const calculateATSScore = require('../services/atsScorer'); // Import the new ATS Intelligence Engine
 const Resume = require('../models/Resume'); 
 const { getResumeById, getAllResumes } = require('../controllers/resumeController'); // Import the new Controller functions
 const router = express.Router();
@@ -39,11 +40,16 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
         const extractedText = await parseResume(req.file.path);
         const extractedSkills = extractSkills(extractedText);
 
+        // --- NEW ATS LOGIC: Guaranteed fresh calculation bounded tightly to the payload
+        const { atsScore, atsBreakdown } = calculateATSScore(extractedText, extractedSkills);
+
         const newResumeDocument = new Resume({
             fileName: req.file.originalname, 
             filePath: req.file.path,         
             extractedText: extractedText,    
-            skills: extractedSkills          
+            skills: extractedSkills,
+            atsScore: atsScore,              // Store the 1-100 integer
+            atsBreakdown: atsBreakdown       // Store the analytical JSON block
         });
 
         await newResumeDocument.save();
@@ -53,7 +59,9 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
             message: 'Resume parsed and saved successfully!',
             resumeId: newResumeDocument._id, 
             fileName: newResumeDocument.fileName,
-            skills: newResumeDocument.skills
+            skills: newResumeDocument.skills,
+            atsScore: newResumeDocument.atsScore,
+            atsBreakdown: newResumeDocument.atsBreakdown
         });
 
     } catch (error) {

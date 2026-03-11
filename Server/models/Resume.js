@@ -23,6 +23,17 @@ const resumeSchema = new mongoose.Schema({
         // Indexing this array makes searching (e.g., finding all users who know React) O(log N) instead of O(N)
         index: true
     },
+    // The quantitative algorithmic strength of the resume (1-100)
+    atsScore: {
+        type: Number,
+        default: 0
+    },
+    // The analytical breakdown of the ATS Score
+    atsBreakdown: {
+        skillsScore: { type: Number, default: 0 },
+        depthScore: { type: Number, default: 0 },
+        structureScore: { type: Number, default: 0 }
+    },
     // Automatically stamps the document with the exact time the upload occurred
     createdAt: {
         type: Date,

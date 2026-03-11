@@ -1,9 +1,10 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const parseResume = require('../services/resumeParser'); // Import our parser service
-const extractSkills = require('../utils/extractSkills'); // Import the skill extraction utility
-const Resume = require('../models/Resume'); // Import our new MongoDB Model
+const parseResume = require('../services/resumeParser'); 
+const extractSkills = require('../utils/extractSkills'); 
+const Resume = require('../models/Resume'); 
+const { getResumeById, getAllResumes } = require('../controllers/resumeController'); // Import the new Controller functions
 const router = express.Router();
 
 // ------------------------------------------------------------------
@@ -26,6 +27,7 @@ const upload = multer({ storage: storage });
 // API ROUTES
 // ------------------------------------------------------------------
 
+// 1. UPLOAD A NEW RESUME (POST)
 router.post('/upload', upload.single('resume'), async (req, res) => {
     try {
         if (!req.file) {
@@ -33,29 +35,20 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
         }
 
         console.log("File saved physically by Multer:", req.file.path);
-
-        // 1. Pass the path of the saved file to our parser service
+        
         const extractedText = await parseResume(req.file.path);
-
-        // 2. Extract structured skills from the raw text
         const extractedSkills = extractSkills(extractedText);
 
-        // --- NEW CODE FOR DAY 5: DB STORAGE ---
-        
-        // 3. Instantiate our Mongoose model with the parsed data
         const newResumeDocument = new Resume({
-            fileName: req.file.originalname, // The original name of the PDF
-            filePath: req.file.path,         // Where it is stored
-            extractedText: extractedText,    // The giant string of text
-            skills: extractedSkills          // The organized array
+            fileName: req.file.originalname, 
+            filePath: req.file.path,         
+            extractedText: extractedText,    
+            skills: extractedSkills          
         });
 
-        // 4. Save the Document into MongoDB Atlas asynchronously
         await newResumeDocument.save();
         console.log("Resume successfully saved to MongoDB Atlas:", newResumeDocument._id);
 
-        // 5. Return a lean, organized response to the frontend client
-        // We omit the giant `extractedText` so we don't clog up bandwidth
         res.status(200).json({
             message: 'Resume parsed and saved successfully!',
             resumeId: newResumeDocument._id, 
@@ -68,5 +61,13 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
         res.status(500).json({ message: 'Server error during upload or database operation.' });
     }
 });
+
+// 2. GET ALL RESUMES (GET)
+// Retrieves a paginated list of all resumes in the database, newest first
+router.get('/', getAllResumes);
+
+// 3. GET RESUME BY ID (GET)
+// Retrieves a specific candidate's resume data
+router.get('/:id', getResumeById);
 
 module.exports = router;

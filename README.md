@@ -57,6 +57,15 @@ This project is a MERN-stack application being developed for placement preparati
   - Updated the upload routing logic to asynchronously create Document instances (`new Resume({...})`) post-extraction.
   - Stripped massive text blocks from the API response to save bandwidth, returning only the lean MongoDB Document ID alongside the detected array.
 
+### [Day 6] - Controller Architecture & Fetch API
+- **[x] Step 11: Modular Business Logic**
+  - Introduced the MVC (Model-View-Controller) pattern, creating `controllers/resumeController.js` to decouple heavy database queries from routing logic.
+- **[x] Step 12: Advanced MongoDB Querying**
+  - Implemented `router.get('/:id')` with strict `mongoose.Types.ObjectId` validation to intercept malformed requests.
+  - Developed `router.get('/')` to return all applicants, integrating mathematical `.skip()` and `.limit()` mechanics for pagination, and `.sort({createdAt: -1})` for reverse-chronological ordering.
+  - Employed Database Projection (`.select('-extractedText')`) across all GET routes to violently strip raw PDF text strings from DB responses, optimizing server memory and network bandwidth.
+  - Established a unified, structured JSON response format (`{ success: boolean, data: ... }`) handling 400, 404, and 500 error scenarios seamlessly.
+
 ## 🔜 Next Steps
 - Implement Authentication (JWT/Bcrypt) to securely associate uploaded resumes with specific User accounts. 
 - Develop Job Posting models for recruiters to upload position requirements.

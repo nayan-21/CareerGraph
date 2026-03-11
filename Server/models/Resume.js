@@ -31,7 +31,11 @@ const resumeSchema = new mongoose.Schema({
     // The analytical breakdown of the ATS Score
     atsBreakdown: {
         skillsScore: { type: Number, default: 0 },
-        depthScore: { type: Number, default: 0 },
+        experienceScore: { type: Number, default: 0 },
+        impactScore: { type: Number, default: 0 },
+        projectScore: { type: Number, default: 0 },
+        educationScore: { type: Number, default: 0 },
+        languageScore: { type: Number, default: 0 },
         structureScore: { type: Number, default: 0 }
     },
     // Automatically stamps the document with the exact time the upload occurred

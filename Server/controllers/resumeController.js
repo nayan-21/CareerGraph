@@ -1,5 +1,58 @@
 const mongoose = require('mongoose');
 const Resume = require('../models/Resume');
+const parseResume = require('../services/resumeParser'); 
+const extractSkills = require('../utils/extractSkills'); 
+const calculateATSScore = require('../services/atsScorer');
+
+/**
+ * Handle resume upload, parsing, ATS scoring, and database storage.
+ * 
+ * @route   POST /api/resume/upload
+ * @access  Public (for now)
+ */
+const uploadResume = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded.' });
+        }
+
+        console.log("File saved physically by Multer:", req.file.path);
+        
+        const extractedText = await parseResume(req.file.path);
+        const extractedSkills = extractSkills(extractedText);
+
+        // Advanced Multi-Factor ATS Intelligence Score
+        const { atsScore, atsBreakdown } = calculateATSScore(extractedText, extractedSkills);
+
+        const newResumeDocument = new Resume({
+            fileName: req.file.originalname, 
+            filePath: req.file.path,         
+            extractedText: extractedText,    
+            skills: extractedSkills,
+            atsScore,
+            atsBreakdown
+        });
+
+        await newResumeDocument.save();
+        console.log("Resume successfully saved to MongoDB Atlas:", newResumeDocument._id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Resume parsed and saved successfully!',
+            data: {
+                resumeId: newResumeDocument._id, 
+                fileName: newResumeDocument.fileName,
+                skills: newResumeDocument.skills,
+                atsScore: newResumeDocument.atsScore,
+                atsBreakdown: newResumeDocument.atsBreakdown
+            }
+        });
+
+    } catch (error) {
+        console.error("Error during upload/parsing/saving/scoring:", error);
+        res.status(500).json({ success: false, message: 'Server error during upload or database operation.' });
+    }
+};
 
 /**
  * Fetch a specific resume by its MongoDB ID.
@@ -91,6 +144,7 @@ const getAllResumes = async (req, res) => {
 };
 
 module.exports = {
+    uploadResume,
     getResumeById,
     getAllResumes
 };

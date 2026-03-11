@@ -5,7 +5,7 @@ const parseResume = require('../services/resumeParser');
 const extractSkills = require('../utils/extractSkills'); 
 const calculateATSScore = require('../services/atsScorer'); // Import the new ATS Intelligence Engine
 const Resume = require('../models/Resume'); 
-const { getResumeById, getAllResumes } = require('../controllers/resumeController'); // Import the new Controller functions
+const { uploadResume, getResumeById, getAllResumes } = require('../controllers/resumeController'); // Import the new Controller functions
 const router = express.Router();
 
 // ------------------------------------------------------------------
@@ -29,49 +29,8 @@ const upload = multer({ storage: storage });
 // ------------------------------------------------------------------
 
 // 1. UPLOAD A NEW RESUME (POST)
-router.post('/upload', upload.single('resume'), async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded.' });
-        }
-
-        console.log("File saved physically by Multer:", req.file.path);
-        
-        const extractedText = await parseResume(req.file.path);
-        const extractedSkills = extractSkills(extractedText);
-
-        // --- NEW ATS LOGIC: Guaranteed fresh calculation bounded tightly to the payload
-        const { atsScore, atsBreakdown } = calculateATSScore(extractedText, extractedSkills);
-
-        const newResumeDocument = new Resume({
-            fileName: req.file.originalname, 
-            filePath: req.file.path,         
-            extractedText: extractedText,    
-            skills: extractedSkills,
-            atsScore: atsScore,              // Store the 1-100 integer
-            atsBreakdown: atsBreakdown       // Store the analytical JSON block
-        });
-
-        await newResumeDocument.save();
-        console.log("Resume successfully saved to MongoDB Atlas:", newResumeDocument._id);
-
-        res.status(200).json({
-            success: true,
-            message: 'Resume parsed and saved successfully!',
-            data: {
-                resumeId: newResumeDocument._id, 
-                fileName: newResumeDocument.fileName,
-                skills: newResumeDocument.skills,
-                atsScore: newResumeDocument.atsScore,
-                atsBreakdown: newResumeDocument.atsBreakdown
-            }
-        });
-
-    } catch (error) {
-        console.error("Error during upload/parsing/saving:", error);
-        res.status(500).json({ message: 'Server error during upload or database operation.' });
-    }
-});
+// Upload processing and ATS logic has been moved to resumeController.js for MVC compliance
+router.post('/upload', upload.single('resume'), uploadResume);
 
 // 2. GET ALL RESUMES (GET)
 // Retrieves a paginated list of all resumes in the database, newest first

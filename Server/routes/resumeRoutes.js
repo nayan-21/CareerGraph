@@ -56,12 +56,15 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
         console.log("Resume successfully saved to MongoDB Atlas:", newResumeDocument._id);
 
         res.status(200).json({
+            success: true,
             message: 'Resume parsed and saved successfully!',
-            resumeId: newResumeDocument._id, 
-            fileName: newResumeDocument.fileName,
-            skills: newResumeDocument.skills,
-            atsScore: newResumeDocument.atsScore,
-            atsBreakdown: newResumeDocument.atsBreakdown
+            data: {
+                resumeId: newResumeDocument._id, 
+                fileName: newResumeDocument.fileName,
+                skills: newResumeDocument.skills,
+                atsScore: newResumeDocument.atsScore,
+                atsBreakdown: newResumeDocument.atsBreakdown
+            }
         });
 
     } catch (error) {

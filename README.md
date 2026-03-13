@@ -72,6 +72,17 @@ This project is a MERN-stack application being developed for placement preparati
   - Updated the Mongoose Schema to permanently trap the Integer `atsScore` and the detailed JSON `atsBreakdown`.
   - Stated the pipeline logic directly inside the `/upload` route *after* extraction but prior to `.save()`, guaranteeing scores are dynamically generated against the fresh payload data every single time.
 
+### [Day 8] - Algorithmic Safeguards & Job Matching Engine
+- **[x] Step 15: ATS Production Refinements**
+  - Overhauled `atsScorer.js` with Senior-level architectural safeguards to prevent ATS score inflation (gaming the system).
+  - Deployed `\b` Regex boundaries to consolidate synonymous sections (e.g., scoring "Profile" and "Summary" as a single block) and implemented precise lexical scoping to segregate engineering degrees.
+  - Neutralized URL-spamming by mapping deployed projects (`vercel.app`, `github.com`) into JavaScript `Set()` structures, ensuring duplicate links count only once.
+- **[x] Step 16: Job Applicant Matcher**
+  - Engineered `services/jobMatcher.js` to dynamically evaluate an incoming Job Description against a parsed candidate's resume.
+  - Filtered unstructured Job Descriptions through our existing `extractSkills.js` pipeline to yield clean arrays.
+  - Leveraged `Set` intersection mathematics to deduce exactly which skills the candidate possesses (`matchedSkills`) and which are lacking (`missingSkills`), computing an automated, clamped 0-100 `matchScore`.
+  - Exposed the computation securely via a new `POST /api/resume/match` endpoint inside `resumeController.js`.
+
 ## 🔜 Next Steps
 - Implement Authentication (JWT/Bcrypt) to securely associate uploaded resumes with specific User accounts. 
 - Develop Job Posting models for recruiters to upload position requirements.

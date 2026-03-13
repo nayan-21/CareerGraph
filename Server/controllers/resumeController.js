@@ -4,6 +4,7 @@ const parseResume = require('../services/resumeParser');
 const extractSkills = require('../utils/extractSkills'); 
 const calculateATSScore = require('../services/atsScorer');
 const calculateJobMatch = require('../services/jobMatcher');
+const generateInsights = require('../services/llmAnalyzer');
 
 /**
  * Handle resume upload, parsing, ATS scoring, and database storage.
@@ -197,9 +198,59 @@ const matchResumeWithJob = async (req, res) => {
     }
 };
 
+/**
+ * Execute the comprehensive AI matching pipeline.
+ * Fetches Resume DB -> Runs Job Math -> Calls Google Gemini -> Returns JSON.
+ * 
+ * @route   POST /api/resume/analyze
+ * @access  Public (for now)
+ */
+const analyzeResumeWithLLM = async (req, res) => {
+    try {
+        const { resumeId, jobDescription } = req.body;
+
+        if (!resumeId || !jobDescription) {
+            return res.status(400).json({ success: false, message: 'Both resumeId and jobDescription are required.' });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(resumeId)) {
+            return res.status(400).json({ success: false, message: 'Invalid Resume ID format.' });
+        }
+
+        // 1. Fetch Resume Data
+        const resume = await Resume.findById(resumeId).select('skills atsScore');
+        if (!resume) {
+            return res.status(404).json({ success: false, message: 'Resume not found.' });
+        }
+
+        // 2. Execute Deterministic Job Math
+        const matchingAnalytics = calculateJobMatch(resume.skills, jobDescription);
+
+        // 3. Execute Non-Deterministic LLM Pipeline
+        const aiResponse = await generateInsights(resume, matchingAnalytics, jobDescription);
+
+        // 4. Return The Unified Analysis
+        res.status(200).json({
+            success: true,
+            data: {
+                atsScore: resume.atsScore,
+                matchScore: matchingAnalytics.matchScore,
+                matchedSkills: matchingAnalytics.matchedSkills,
+                missingSkills: matchingAnalytics.missingSkills,
+                insights: aiResponse.insights
+            }
+        });
+
+    } catch (error) {
+        console.error("Error generating unified LLM analysis:", error);
+        res.status(500).json({ success: false, message: 'Server error during AI analysis pipeline.' });
+    }
+};
+
 module.exports = {
     uploadResume,
     getResumeById,
     getAllResumes,
-    matchResumeWithJob
+    matchResumeWithJob,
+    analyzeResumeWithLLM
 };

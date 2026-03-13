@@ -83,6 +83,13 @@ This project is a MERN-stack application being developed for placement preparati
   - Leveraged `Set` intersection mathematics to deduce exactly which skills the candidate possesses (`matchedSkills`) and which are lacking (`missingSkills`), computing an automated, clamped 0-100 `matchScore`.
   - Exposed the computation securely via a new `POST /api/resume/match` endpoint inside `resumeController.js`.
 
+### [Day 9] - Gemini LLM Integration
+- **[x] Step 17: AI Insights Generation Engine**
+  - Engineered `services/llmAnalyzer.js` to augment the mathematical job matching process with qualitative AI evaluations.
+  - Implemented a secure pipeline to inject ATS scores, Match percentages, and Skill Arrays into strict prompt templates directed at Google's `gemini-2.5-flash` endpoint.
+  - Enforced production safeguards including implicit `.env` API Key validation, graceful network failovers (`try/catch`), string truncation to optimize token limits (max 1500 chars), array Set deduplication, and optional chaining syntax to intercept malformed 404/500 backend responses gracefully.
+  - Connected the non-deterministic AI architecture alongside the deterministic Math Matching algorithms inside `resumeController.js`, exposing a unified analysis dashboard via the `POST /api/resume/analyze` endpoint.
+
 ## 🔜 Next Steps
 - Implement Authentication (JWT/Bcrypt) to securely associate uploaded resumes with specific User accounts. 
 - Develop Job Posting models for recruiters to upload position requirements.

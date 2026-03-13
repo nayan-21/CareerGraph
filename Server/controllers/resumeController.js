@@ -3,6 +3,7 @@ const Resume = require('../models/Resume');
 const parseResume = require('../services/resumeParser'); 
 const extractSkills = require('../utils/extractSkills'); 
 const calculateATSScore = require('../services/atsScorer');
+const calculateJobMatch = require('../services/jobMatcher');
 
 /**
  * Handle resume upload, parsing, ATS scoring, and database storage.
@@ -143,8 +144,62 @@ const getAllResumes = async (req, res) => {
     }
 };
 
+/**
+ * Evaluate an existing resume against a raw Job Description to generate a Match Score.
+ * 
+ * @route   POST /api/resume/match
+ * @access  Public (for now)
+ */
+const matchResumeWithJob = async (req, res) => {
+    try {
+        const { resumeId, jobDescription } = req.body;
+
+        // 1. Defensively validate Input payloads
+        if (!resumeId || !jobDescription) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Both resumeId and jobDescription string are required.' 
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(resumeId)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid Resume ID format.' 
+            });
+        }
+
+        // 2. Fetch the Resume skills 
+        const resume = await Resume.findById(resumeId).select('skills');
+        
+        if (!resume) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Resume not found in the database.' 
+            });
+        }
+
+        // 3. Engage the Job Matching Engine algorithms
+        const matchingAnalytics = calculateJobMatch(resume.skills, jobDescription);
+
+        // 4. Return the intelligent Matching Matrix JSON
+        res.status(200).json({
+            success: true,
+            data: matchingAnalytics
+        });
+
+    } catch (error) {
+        console.error("Error generating Job Match:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error while calculating job match mapping.' 
+        });
+    }
+};
+
 module.exports = {
     uploadResume,
     getResumeById,
-    getAllResumes
+    getAllResumes,
+    matchResumeWithJob
 };

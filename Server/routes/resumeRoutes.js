@@ -5,7 +5,7 @@ const parseResume = require('../services/resumeParser');
 const extractSkills = require('../utils/extractSkills'); 
 const calculateATSScore = require('../services/atsScorer'); // Import the new ATS Intelligence Engine
 const Resume = require('../models/Resume'); 
-const { uploadResume, getResumeById, getAllResumes } = require('../controllers/resumeController'); // Import the new Controller functions
+const { uploadResume, getResumeById, getAllResumes, matchResumeWithJob } = require('../controllers/resumeController'); // Import the new Controller functions
 const router = express.Router();
 
 // ------------------------------------------------------------------
@@ -39,5 +39,9 @@ router.get('/', getAllResumes);
 // 3. GET RESUME BY ID (GET)
 // Retrieves a specific candidate's resume data
 router.get('/:id', getResumeById);
+
+// 4. GENERATE JOB MATCH (POST)
+// Compares a stored resume against a raw Job Description text to yield a match percentage
+router.post('/match', matchResumeWithJob);
 
 module.exports = router;

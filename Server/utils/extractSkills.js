@@ -32,9 +32,15 @@ const extractSkills = (resumeText) => {
     let normalizedText = resumeText.toLowerCase();
     
     // Remove punctuation (keeping alphanumeric and spaces)
-    // We replace anything that isn't a letter, number, dot, or plus sign (like C++) with a space
+    // We replace anything that isn't a letter, number, dot, or plus sign (like C++) with a space.
+    // However, if a word is immediately followed by a period or comma without a space, we need 
+    // to ensure it gets padded correctly so `.includes(' docker ')` doesn't skip it.
     normalizedText = normalizedText.replace(/[^a-z0-9.+]/g, ' ');
     
+    // Explicitly replace standalone periods that act as sentence enders, so "docker." becomes "docker "
+    // (but preserving . in "node.js")
+    normalizedText = normalizedText.replace(/(?<!node)\.(?!\js)/g, ' ');
+
     // Normalize spaces (convert multiple spaces into a single space)
     normalizedText = normalizedText.replace(/\s+/g, ' ').trim();
 

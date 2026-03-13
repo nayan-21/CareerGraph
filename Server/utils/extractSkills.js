@@ -3,21 +3,99 @@
  * This ensures "React.js" and "reactjs" both map to the clean "React" array element.
  */
 const skillDictionary = {
-    "React": ["react", "react.js", "reactjs", "react js"],
-    "Node.js": ["node", "nodejs", "node.js", "node js"],
-    "JavaScript": ["javascript", "js", "java script"],
-    "HTML": ["html", "html5"],
-    "CSS": ["css", "css3", "tailwind css", "bootstrap"],
-    "Express.js": ["express", "express.js", "expressjs"],
-    "MongoDB": ["mongodb", "mongo", "mongo db"],
-    "Python": ["python", "py", "python3"],
-    "Java": ["java", "core java", "j2ee"],
-    "SQL": ["sql", "mysql", "postgresql", "postgres"],
-    "Git": ["git", "github", "gitlab"],
-    "Docker": ["docker", "containerization"],
-    "AWS": ["aws", "amazon web services"],
-    "TypeScript": ["typescript", "ts"],
-    "C++": ["c++", "cpp", "c/c++"]
+
+  // Frontend
+  "React": ["react", "react.js", "reactjs", "react js"],
+  "Next.js": ["next", "nextjs", "next.js"],
+  "Vue.js": ["vue", "vue.js", "vuejs"],
+  "Angular": ["angular", "angular.js", "angularjs"],
+  "JavaScript": ["javascript", "js", "java script"],
+  "TypeScript": ["typescript", "ts"],
+  "HTML": ["html", "html5"],
+  "CSS": ["css", "css3"],
+  "TailwindCSS": ["tailwind", "tailwind css"],
+  "Bootstrap": ["bootstrap", "bootstrap5"],
+  "Redux": ["redux", "redux toolkit"],
+
+  // Backend
+  "Node.js": ["node", "nodejs", "node.js", "node js"],
+  "Express.js": ["express", "express.js", "expressjs"],
+  "Django": ["django"],
+  "Flask": ["flask"],
+  "Spring Boot": ["spring boot", "springboot"],
+  "ASP.NET": ["asp.net", "aspnet"],
+
+  // Programming Languages
+  "Java": ["java", "core java", "j2ee"],
+  "Python": ["python", "python3", "py"],
+  "C": ["c language", "ansi c"],
+  "C++": ["c++", "cpp"],
+  "C#": ["c#", "c sharp"],
+  "Go": ["golang", "go language", "go"],
+  "Rust": ["rust"],
+  "Kotlin": ["kotlin"],
+  "Swift": ["swift"],
+
+  // Databases
+  "MongoDB": ["mongodb", "mongo", "mongo db"],
+  "MySQL": ["mysql"],
+  "PostgreSQL": ["postgresql", "postgres"],
+  "SQL": ["sql"],
+  "SQLite": ["sqlite"],
+  "Redis": ["redis"],
+  "Firebase": ["firebase", "firebase database"],
+
+  // DevOps / Cloud
+  "Docker": ["docker", "containerization"],
+  "Kubernetes": ["kubernetes", "k8s"],
+  "AWS": ["aws", "amazon web services"],
+  "Azure": ["azure", "microsoft azure"],
+  "Google Cloud": ["gcp", "google cloud"],
+  "CI/CD": ["ci/cd", "continuous integration", "continuous deployment"],
+  "Jenkins": ["jenkins"],
+  "Terraform": ["terraform"],
+
+  // Version Control
+  "Git": ["git"],
+  "GitHub": ["github"],
+  "GitLab": ["gitlab"],
+  "Bitbucket": ["bitbucket"],
+
+  // Testing
+  "Jest": ["jest"],
+  "Mocha": ["mocha"],
+  "Chai": ["chai"],
+  "Selenium": ["selenium"],
+  "Cypress": ["cypress"],
+
+  // API / Networking
+  "REST API": ["rest", "rest api", "restful api"],
+  "GraphQL": ["graphql"],
+  "Postman": ["postman"],
+  "Swagger": ["swagger"],
+
+  // Data / AI
+  "Machine Learning": ["machine learning", "ml"],
+  "Deep Learning": ["deep learning", "dl"],
+  "TensorFlow": ["tensorflow"],
+  "PyTorch": ["pytorch"],
+  "Pandas": ["pandas"],
+  "NumPy": ["numpy"],
+  "Scikit-learn": ["scikit-learn", "sklearn"],
+
+  // Mobile
+  "React Native": ["react native"],
+  "Flutter": ["flutter"],
+  "Android": ["android"],
+  "iOS": ["ios"],
+
+  // Other tools
+  "Linux": ["linux", "ubuntu"],
+  "Nginx": ["nginx"],
+  "Webpack": ["webpack"],
+  "Babel": ["babel"],
+  "Socket.io": ["socket.io", "socketio"]
+
 };
 
 /**

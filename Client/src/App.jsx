@@ -1,95 +1,38 @@
-import { useState, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
+
+import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
 import UploadForm from './components/UploadForm';
-import JobForm from './components/JobForm';
 import ResultsPanel from './components/ResultsPanel';
 
-const API_URL = import.meta.env.VITE_API_URL;
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 
 export default function App() {
-    // ─── Core State ──────────────────────────────────
-    const [resumeId, setResumeId] = useState(null);
-    const [jobDescription, setJobDescription] = useState('');
-    const [analysisData, setAnalysisData] = useState(null);
-    const [analyzing, setAnalyzing] = useState(false);
-    const [analyzeError, setAnalyzeError] = useState('');
-
-    // Auto-scroll target
-    const resultsRef = useRef(null);
-
-    // ─── Handler: Resume Upload Success ──────────────
-    const handleUploadSuccess = (id) => {
-        setResumeId(id);
-        setAnalysisData(null); // Clear old results when a new resume is uploaded
-        setAnalyzeError('');
-    };
-
-    // ─── Handler: Analyze ────────────────────────────
-    const handleAnalyze = async () => {
-        if (!resumeId || !jobDescription.trim()) return;
-
-        setAnalyzing(true);
-        setAnalyzeError('');
-
-        try {
-            const res = await fetch(`${API_URL}/analyze`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resumeId, jobDescription })
-            });
-
-            const json = await res.json();
-
-            if (!res.ok || !json.success) {
-                throw new Error(json.message || 'Analysis failed. Please try again.');
-            }
-
-            setAnalysisData(json.data);
-
-            // Safeguard 6: Smooth scroll to results
-            setTimeout(() => {
-                resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-
-        } catch (err) {
-            setAnalyzeError(err.message || 'Server error during analysis.');
-        } finally {
-            setAnalyzing(false);
-        }
-    };
-
     return (
-        <div className="app">
-            {/* ─── Header ─── */}
-            <header className="app-header">
-                <h1>CareerGraph</h1>
-                <p>AI-powered resume analysis and job match scoring</p>
-            </header>
+        <BrowserRouter>
+            <Navbar />
+            <Routes>
+                {/* Public routes */}
+                <Route path="/login"    element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-            {/* ─── Step 1: Upload ─── */}
-            <UploadForm onUploadSuccess={handleUploadSuccess} />
+                {/* Protected routes */}
+                <Route path="/dashboard" element={
+                    <ProtectedRoute><Dashboard /></ProtectedRoute>
+                } />
+                <Route path="/upload" element={
+                    <ProtectedRoute><div className="app"><UploadForm onUploadSuccess={() => {}} /></div></ProtectedRoute>
+                } />
+                <Route path="/analyze" element={
+                    <ProtectedRoute><div className="app"><ResultsPanel data={null} /></div></ProtectedRoute>
+                } />
 
-            {/* ─── Step 2: Job Description + Analyze ─── */}
-            <JobForm
-                resumeId={resumeId}
-                loading={analyzing}
-                onAnalyze={{
-                    run: handleAnalyze,
-                    setJobDescription
-                }}
-            />
-
-            {/* ─── Analyze Error ─── */}
-            {analyzeError && (
-                <div className="error-banner" style={{ marginBottom: 16 }}>
-                    ⚠️ {analyzeError}
-                </div>
-            )}
-
-            {/* ─── Step 3: Results ─── */}
-            <div ref={resultsRef}>
-                <ResultsPanel data={analysisData} />
-            </div>
-        </div>
+                {/* Root redirect */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+        </BrowserRouter>
     );
 }

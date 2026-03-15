@@ -33,11 +33,10 @@ const userSchema = new mongoose.Schema({
  * Pre-save hook: automatically hash password before persisting to MongoDB.
  * Skips hashing if the password field was not modified (e.g., on profile updates).
  */
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
 });
 
 module.exports = mongoose.model('User', userSchema);

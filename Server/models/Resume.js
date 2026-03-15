@@ -38,6 +38,11 @@ const resumeSchema = new mongoose.Schema({
         languageScore: { type: Number, default: 0 },
         structureScore: { type: Number, default: 0 }
     },
+    // Reference to the User who uploaded this resume
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     // Automatically stamps the document with the exact time the upload occurred
     createdAt: {
         type: Date,

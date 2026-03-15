@@ -35,6 +35,9 @@ const uploadResume = async (req, res) => {
             atsBreakdown
         });
 
+        // Attach the authenticated user's ID - links this resume to their account
+        newResumeDocument.userId = req.user._id;
+
         await newResumeDocument.save();
         console.log("Resume successfully saved to MongoDB Atlas:", newResumeDocument._id);
 

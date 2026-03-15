@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const resumeRoutes = require('./routes/resumeRoutes');
+const authRoutes = require('./routes/authRoutes');
 require('dotenv').config(); // Loads environment variables from a .env file into process.env
 
 // Initialize the Express application
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors()); // Enables Cross-Origin Resource Sharing (allows your frontend to communicate with this backend)
 app.use(express.json()); // Automatically parses incoming requests with JSON payloads
 app.use('/api/resume', resumeRoutes); // All requests to /api/resume will be handled by resumeRoutes
+app.use('/api/auth', authRoutes);     // All requests to /api/auth will be handled by authRoutes
 
 // Create a basic testing route
 // When someone visits the root URL ('/'), this function sends back a simple message

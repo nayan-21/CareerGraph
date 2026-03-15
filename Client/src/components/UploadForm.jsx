@@ -30,8 +30,12 @@ export default function UploadForm({ onUploadSuccess }) {
         setError('');
 
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(`${API_URL}/upload`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 body: formData
             });
 
